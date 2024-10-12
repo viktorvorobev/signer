@@ -161,3 +161,7 @@ cython_debug/
 
 # VSCode
 .vscode/
+
+# Test and example files
+test.pdf
+example.*
