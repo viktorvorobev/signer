@@ -7,10 +7,6 @@ import pathlib
 
 RED_CELL = fpdf.FontFace(family="Times", emphasis="B", size_pt=12, fill_color=(240, 192, 193))
 WHITE_CELL = fpdf.FontFace(family="Times", emphasis="B", size_pt=12, fill_color=(255, 255, 255))
-FILL_COLOR_WHITE = (0, 0, 0)
-
-TEXT_STYLE_NORMAL = {"family": "Times", "style": "", "size": 12}
-TEXT_STYLE_BALD = {"family": "Times", "style": "B", "size": 12}
 
 
 class PdfCreator(fpdf.FPDF):
@@ -48,22 +44,22 @@ class PdfCreator(fpdf.FPDF):
 
     def create_pdf(self) -> None:
         self.add_page()
-        self.set_font(**TEXT_STYLE_NORMAL)
-        self.set_fill_color(FILL_COLOR_WHITE)
-        with self.table(line_height=5, col_widths=(0.26, 0.16, 0.16, 0.16, 0.25)) as table:
+        self.set_font(family="Times", style="", size=12)
+        self.set_fill_color(r=0, g=0, b=0)  # white
+        with self.table(line_height=5, col_widths=(26, 16, 16, 16, 25)) as table:
             self._create_header(table)
             self._create_body(table)
             self._create_footer(table)
 
     def _create_header(self, table: fpdf.table.Table) -> None:
-        self.set_font(**TEXT_STYLE_BALD)
+        self.set_font(family="Times", style="B", size=12)
         row = table.row(style=RED_CELL)
         row.cell(self.TITLE.format(self._date.strftime("%Y %B")), align=fpdf.enums.Align.C, colspan=5)
 
         row = table.row(style=RED_CELL)
         row.cell(self._name, align=fpdf.enums.Align.C, colspan=5)
 
-        self.set_font(**TEXT_STYLE_NORMAL)
+        self.set_font(family="Times", style="", size=12)
         row = table.row(style=RED_CELL)
         for title in self.COLUMNS:
             row.cell(title, align=fpdf.enums.Align.C)
@@ -86,7 +82,7 @@ class PdfCreator(fpdf.FPDF):
                     self._work_days_total += 1
                     row.cell(f"{self.WORK_HOURS}", align=fpdf.enums.Align.C)
                 if self._signature:
-                    row.cell(img=self._signature)
+                    row.cell(img=str(self._signature))
                 else:
                     row.cell()
 
@@ -117,7 +113,7 @@ if __name__ == "__main__":
     pdf = PdfCreator(
         name="Vorobev Viktor",
         vacation_days=[],
-        public_holidays=[datetime.datetime(year=2024, month=10, day=23)],
+        public_holidays=[datetime.datetime(year=2024, month=10, day=24)],
         signature=pathlib.Path("./example.png"),
     )
     pdf.create_pdf()
