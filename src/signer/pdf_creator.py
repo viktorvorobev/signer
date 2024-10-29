@@ -88,7 +88,8 @@ class PdfCreator(fpdf.FPDF):
 
             else:
                 row = table.row(style=RED_CELL)
-                for _ in self.COLUMNS:
+                row.cell(f"{date.day}", align=fpdf.enums.Align.C)
+                for _ in self.COLUMNS[1:]:
                     row.cell()
 
     def _create_footer(self, table: fpdf.table.Table) -> None:
@@ -113,7 +114,7 @@ if __name__ == "__main__":
     pdf = PdfCreator(
         name="Vorobev Viktor",
         vacation_days=[],
-        public_holidays=[datetime.datetime(year=2024, month=10, day=24)],
+        public_holidays=[datetime.datetime(year=2024, month=10, day=23)],
         signature=pathlib.Path("./example.png"),
     )
     pdf.create_pdf()
