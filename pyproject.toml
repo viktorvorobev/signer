@@ -24,6 +24,8 @@ dev = [
     "types-beautifulsoup4==4.12.0.20241020",
     "pytest==8.3.3",
     "pytest-cov==6.0.0",
+    "pypdf-table-extraction[base]",
+    "opencv-python",
 ]
 
 [build-system]
