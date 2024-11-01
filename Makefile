@@ -1,3 +1,5 @@
+all: type-check lint style-check
+
 type-check:
 	mypy src
 
