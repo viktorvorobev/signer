@@ -1,4 +1,4 @@
-all: type-check lint style-check
+all: type-check lint style-check test
 
 type-check:
 	mypy src
@@ -8,3 +8,6 @@ lint:
 
 style-check:
 	ruff format --check src
+
+test:
+	pytest src --cov signer
