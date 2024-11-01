@@ -10,7 +10,7 @@ MIN_MONTH = 1
 MAX_MONTH = 12
 
 
-class DayType(enum.StrEnum):
+class DayType(enum.Enum):
     WORK_DAY = enum.auto()
     REST_DAY = enum.auto()
     HOLIDAY = enum.auto()
