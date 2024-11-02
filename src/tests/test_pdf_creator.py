@@ -1,36 +1,9 @@
-import os
-import pathlib
-import tempfile
+# type: ignore
 
-import camelot
-
-import signer.pdf_creator as signer
-
-
-def test_creates():
-    with tempfile.TemporaryDirectory() as td:
-        tmp_file_name = "temp_file.pdf"
-        tmp_file_path = pathlib.Path(td, tmp_file_name)
-        assert not os.path.exists(tmp_file_path)
-
-        creator = signer.PdfCreator(name="Test test")
-        creator.create_pdf()
-        creator.output(str(tmp_file_path))
-
-        assert os.path.exists(tmp_file_path)
+from . import utils
 
 
 def test_name():
     name = "TEST NAME"
-    with tempfile.TemporaryDirectory() as td:
-        tmp_file_name = "temp_file.pdf"
-        tmp_file_path = pathlib.Path(td, tmp_file_name)
-        assert not os.path.exists(tmp_file_path)
-
-        creator = signer.PdfCreator(name=name)
-        creator.create_pdf()
-        creator.output(str(tmp_file_path))
-
-        assert os.path.exists(tmp_file_path)
-        data = camelot.read_pdf(str(tmp_file_path), flavor="stream")[0]  # type: ignore
-        assert data.cells[1][2].text.strip() == name  # type: ignore
+    data = utils.create_pdf_and_get_result(name=name)
+    assert data.name == name
