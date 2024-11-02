@@ -10,4 +10,5 @@ style-check:
 	ruff format --check src
 
 test:
-	pytest src --cov signer
+	pytest src --cov signer \
+		-W ignore::cryptography.utils.CryptographyDeprecationWarning
