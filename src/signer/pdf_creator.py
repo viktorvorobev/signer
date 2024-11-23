@@ -110,7 +110,7 @@ class PdfCreator(fpdf.FPDF):
         row.cell(f"{len(self._vacation_days)}", colspan=4, align=fpdf.enums.Align.C)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     pdf = PdfCreator(
         name="Vorobev Viktor",
         vacation_days=[],
