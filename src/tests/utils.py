@@ -1,9 +1,12 @@
 # type: ignore
 
+import calendar
 import copy
 import dataclasses
+import datetime
 import os
 import pathlib
+import random
 import tempfile
 
 import camelot
@@ -159,3 +162,15 @@ def _validate_static_info(converted: PdfOutput):
             assert day.start_time == PdfCreator.START_TIME
         if day.end_time:
             assert day.end_time == PdfCreator.END_TIME
+
+
+def get_random_weekdays_in_month(year: int, month: int, days_amount: int) -> list[datetime.datetime]:
+    vacation_days = set()
+    days_in_month = calendar.monthrange(year=year, month=month)[1]
+    while len(vacation_days) < days_amount:
+        try_day = random.choice(range(1, days_in_month + 1))
+        try_datetime = datetime.datetime(year=year, month=month, day=try_day)
+        if try_datetime.weekday() in (5, 6):  # saturday and sunday
+            continue
+        vacation_days.add(try_datetime)
+    return list(vacation_days)
