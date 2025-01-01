@@ -2,12 +2,20 @@ import calendar
 import datetime
 import enum
 import os
-
+from dataclasses import dataclass
 import requests
 from bs4 import BeautifulSoup, Tag
 
 MIN_MONTH = 1
 MAX_MONTH = 12
+
+
+@dataclass
+class CrawledData:
+    workdays: list[datetime.date]
+    rest_days: list[datetime.date]
+    holidays: list[datetime.date]
+    additional_workdays: list[datetime.date]
 
 
 class DayType(enum.Enum):
@@ -57,25 +65,15 @@ class Crawler:
             DayType.REST_DAY: [],
         }
 
-    @property
-    def workdays(self) -> list[datetime.date]:
-        return self._days[DayType.WORK_DAY]
-
-    @property
-    def rest_days(self) -> list[datetime.date]:
-        return self._days[DayType.REST_DAY]
-
-    @property
-    def holidays(self) -> list[datetime.date]:
-        return self._days[DayType.PUBLIC_HOLIDAY]
-
-    @property
-    def additional_workdays(self) -> list[datetime.date]:
-        return self._days[DayType.ADDITIONAL_WORKDAY]
-
-    def crawl(self):
+    def crawl(self) -> CrawledData:
         page = self._get_page_content()
         self._parse(page)
+        return CrawledData(
+            workdays=self._days[DayType.WORK_DAY],
+            rest_days=self._days[DayType.REST_DAY],
+            holidays=self._days[DayType.PUBLIC_HOLIDAY],
+            additional_workdays=self._days[DayType.ADDITIONAL_WORKDAY],
+        )
 
     def _get_page_content(self):
         endpoint = f"munkaido-{self.year}.html"
@@ -118,6 +116,6 @@ class Crawler:
 
 if __name__ == "__main__":
     crawler = Crawler(year=2024, month=12)
-    crawler.crawl()
-    print(crawler.holidays)
-    print(crawler.additional_workdays)
+    data = crawler.crawl()
+    print(data.holidays)
+    print(data.additional_workdays)
