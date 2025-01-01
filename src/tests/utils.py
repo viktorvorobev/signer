@@ -13,6 +13,7 @@ import camelot
 import camelot.core as camelot_core
 
 from signer.pdf_creator import PdfCreator
+from signer.constants import AttendanceParams
 
 
 @dataclasses.dataclass
@@ -40,7 +41,8 @@ class PdfOutput:
 
 
 def create_pdf_and_get_result(*args, **kwargs) -> PdfOutput:
-    data = _create_pdf_and_get_result(*args, **kwargs)
+    params = AttendanceParams(*args, **kwargs)
+    data = _create_pdf_and_get_result(params)
 
     converted = _convert_table(data)
     _validate_static_info(converted)
@@ -48,13 +50,13 @@ def create_pdf_and_get_result(*args, **kwargs) -> PdfOutput:
     return converted
 
 
-def _create_pdf_and_get_result(*args, **kwargs) -> camelot_core.Table:
+def _create_pdf_and_get_result(params) -> camelot_core.Table:
     with tempfile.TemporaryDirectory() as temp_dir:
         tmp_file_name = "temp_file.pdf"
         tmp_file_path = pathlib.Path(temp_dir, tmp_file_name)
         assert not os.path.exists(tmp_file_path)
 
-        creator = PdfCreator(*args, **kwargs)
+        creator = PdfCreator(params)
         creator.create_pdf()
         creator.output(str(tmp_file_path))
 
