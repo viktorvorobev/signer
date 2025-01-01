@@ -77,11 +77,9 @@ class Crawler:
 
         if not os.path.exists(endpoint):
             with open(endpoint, "w") as f:
-                print(f"Fetching content from {url}")
                 response = requests.get(url)
                 f.write(response.text)
 
-        print(f"Reading cached content from {url}")
         with open(endpoint, "r") as f:
             return f.read()
 
@@ -113,6 +111,8 @@ class Crawler:
 
 
 if __name__ == "__main__":
-    crawler = Crawler(year=2024, month=8)
+    crawler = Crawler(year=2024, month=12)
     crawler.crawl()
     print(crawler.holidays)
+    print(crawler.workdays)
+    print(crawler.rest_days)
