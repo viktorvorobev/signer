@@ -105,6 +105,11 @@ class Crawler:
             day_div_class = day_div["class"][0]
 
             date_type = DIV_CLASS_TO_DAY_TYPE[day_div_class]
+
+            date = datetime.date(year=self.year, month=self.month, day=_day)
+            if date.weekday() in (5, 6) and date_type != DayType.ADDITIONAL_WORKDAY:
+                date_type = DayType.REST_DAY
+
             self._days[date_type].append(
                 datetime.date(
                     year=self.year,
