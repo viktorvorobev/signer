@@ -12,8 +12,8 @@ import tempfile
 import camelot
 import camelot.core as camelot_core
 
-from signer.pdf_creator import PdfCreator
 from signer.constants import AttendanceParams
+from signer.pdf_creator import PdfCreator
 
 
 @dataclasses.dataclass
@@ -166,13 +166,14 @@ def _validate_static_info(converted: PdfOutput):
             assert day.end_time == PdfCreator.END_TIME
 
 
-def get_random_weekdays_in_month(year: int, month: int, days_amount: int) -> list[datetime.datetime]:
+def get_random_days_in_month(year: int, month: int, days_amount: int, weekdays: bool = True) -> list[datetime.datetime]:
+    forbidden_days = (5, 6) if weekdays else (0, 1, 2, 3, 4)
     vacation_days = set()
     days_in_month = calendar.monthrange(year=year, month=month)[1]
     while len(vacation_days) < days_amount:
         try_day = random.choice(range(1, days_in_month + 1))
         try_datetime = datetime.datetime(year=year, month=month, day=try_day)
-        if try_datetime.weekday() in (5, 6):  # saturday and sunday
+        if try_datetime.weekday() in forbidden_days:
             continue
         vacation_days.add(try_datetime)
     return list(vacation_days)

@@ -34,7 +34,7 @@ def test_name():
 def test_holiday(month: int, year: int):
     name = "Name Surname"
 
-    public_holidays = utils.get_random_weekdays_in_month(year=year, month=month, days_amount=4)
+    public_holidays = utils.get_random_days_in_month(year=year, month=month, days_amount=4)
 
     result = utils.create_pdf_and_get_result(
         name=name,
@@ -51,7 +51,7 @@ def test_holiday(month: int, year: int):
 def test_vacation_days(month: int, year: int):
     name = "Name Surname"
 
-    vacation_days = utils.get_random_weekdays_in_month(year=year, month=month, days_amount=5)
+    vacation_days = utils.get_random_days_in_month(year=year, month=month, days_amount=5)
 
     result = utils.create_pdf_and_get_result(
         name=name,
