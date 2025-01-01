@@ -92,7 +92,7 @@ class Crawler:
         month_str = MONTH_NUM_TO_STR[self.month]
         month = soup.find("div", string=month_str)  # row with exact month name
 
-        if not month or not month.parent:
+        if not month or not month.parent:  # pragma: no cover
             raise RuntimeError(f"Failed to find {month_str}")
         month = month.parent  # calendar month block
 
@@ -100,7 +100,7 @@ class Crawler:
         for day in range(monthrange[1]):
             _day = day + 1  # convert from range to date
             day_div = month.find("div", string=f"{_day}")
-            if not day_div or not isinstance(day_div, Tag):
+            if not day_div or not isinstance(day_div, Tag):  # pragma: no cover
                 raise RuntimeError(f"Failed to find {_day} day for {month_str}")
             day_div_class = day_div["class"][0]
 
@@ -119,7 +119,7 @@ class Crawler:
             )
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     crawler = Crawler(year=2024, month=12)
     data = crawler.crawl()
     print(data.holidays)
