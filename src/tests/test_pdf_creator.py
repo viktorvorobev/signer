@@ -1,5 +1,6 @@
 # type: ignore
 
+import calendar
 import datetime
 
 import pytest
@@ -61,3 +62,32 @@ def test_vacation_days(month: int, year: int):
     )
 
     assert result.vacation_days == len(vacation_days)
+
+
+@pytest.mark.parametrize("year", YEARS)
+@pytest.mark.parametrize("month", MONTHS)
+def test_additional_workdays(month: int, year: int):
+    name = "Name Surname"
+
+    workdays = 0
+    days_in_month = calendar.monthrange(year=year, month=month)[1]
+    for day in range(days_in_month):
+        date = datetime.datetime(year=year, month=month, day=day + 1)
+        if date.weekday() not in (5, 6):
+            workdays += 1
+
+    additional_workdays_amount = 2
+    additional_workdays = utils.get_random_days_in_month(
+        year=year,
+        month=month,
+        days_amount=additional_workdays_amount,
+        weekdays=False,
+    )
+    result = utils.create_pdf_and_get_result(
+        name=name,
+        month=month,
+        year=year,
+        additional_workdays=list(additional_workdays),
+    )
+    assert result.workdays_total == workdays + additional_workdays_amount
+    assert result.work_hours_total == (workdays + additional_workdays_amount) * PdfCreator.WORK_HOURS
