@@ -11,9 +11,10 @@ MAX_MONTH = 12
 
 
 class DayType(enum.Enum):
+    ADDITIONAL_WORKDAY = enum.auto()
+    PUBLIC_HOLIDAY = enum.auto()
     WORK_DAY = enum.auto()
     REST_DAY = enum.auto()
-    HOLIDAY = enum.auto()
 
 
 MONTH_NUM_TO_STR = {
@@ -32,9 +33,9 @@ MONTH_NUM_TO_STR = {
 }
 
 DIV_CLASS_TO_DAY_TYPE = {
-    "caltdred": DayType.HOLIDAY,
-    "caltdsarga": DayType.HOLIDAY,
-    "caltdszurke": DayType.WORK_DAY,
+    "caltdred": DayType.PUBLIC_HOLIDAY,
+    "caltdsarga": DayType.PUBLIC_HOLIDAY,
+    "caltdszurke": DayType.ADDITIONAL_WORKDAY,
     "caltd": DayType.WORK_DAY,
     "caltdb": DayType.REST_DAY,
 }
@@ -50,7 +51,8 @@ class Crawler:
         self.month = month
 
         self._days: dict[DayType, list[datetime.date]] = {
-            DayType.HOLIDAY: [],
+            DayType.PUBLIC_HOLIDAY: [],
+            DayType.ADDITIONAL_WORKDAY: [],
             DayType.WORK_DAY: [],
             DayType.REST_DAY: [],
         }
@@ -65,7 +67,11 @@ class Crawler:
 
     @property
     def holidays(self) -> list[datetime.date]:
-        return self._days[DayType.HOLIDAY]
+        return self._days[DayType.PUBLIC_HOLIDAY]
+
+    @property
+    def additional_workdays(self) -> list[datetime.date]:
+        return self._days[DayType.ADDITIONAL_WORKDAY]
 
     def crawl(self):
         page = self._get_page_content()
@@ -114,5 +120,4 @@ if __name__ == "__main__":
     crawler = Crawler(year=2024, month=12)
     crawler.crawl()
     print(crawler.holidays)
-    print(crawler.workdays)
-    print(crawler.rest_days)
+    print(crawler.additional_workdays)
