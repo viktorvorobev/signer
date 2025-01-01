@@ -1,9 +1,11 @@
 import calendar
 import datetime
+import pathlib
 
 import fpdf
 import fpdf.table
-import pathlib
+
+from signer import constants as c
 
 RED_CELL = fpdf.FontFace(family="Times", emphasis="B", size_pt=12, fill_color=(240, 192, 193))
 WHITE_CELL = fpdf.FontFace(family="Times", emphasis="B", size_pt=12, fill_color=(255, 255, 255))
@@ -21,25 +23,17 @@ class PdfCreator(fpdf.FPDF):
     PUBLIC_HOLIDAYS_NAME = "Ünnepnapok száma\nPublic holidays"
     VACATION_DAYS = "Szabadnapok száma\nVacation days"
 
-    def __init__(  # noqa: PLR0913
-        self,
-        name: str,
-        month: int = 0,
-        year: int = 0,
-        public_holidays: list[datetime.date] | None = None,
-        vacation_days: list[datetime.date] | None = None,
-        signature: pathlib.Path | None = None,
-    ) -> None:
+    def __init__(self, attendance_params: c.AttendanceParams) -> None:
         super().__init__()
-        self._name = name
-        if month and year:
-            self._date = datetime.datetime(year=year, month=month, day=1)
-        else:
-            self._date = datetime.datetime.today()
+        self._name = attendance_params.name
 
-        self._public_holidays = public_holidays if public_holidays else []
-        self._vacation_days = vacation_days if vacation_days else []
-        self._signature = signature
+        self._date = attendance_params.date
+
+        self._public_holidays = attendance_params.public_holidays or []
+        self._vacation_days = attendance_params.vacation_days or []
+        self._additional_workdays = attendance_params.additional_workdays or []
+
+        self._signature = attendance_params.signature
         self._work_days_total = 0
 
     def create_pdf(self) -> None:
@@ -69,28 +63,28 @@ class PdfCreator(fpdf.FPDF):
         for day in range(monthrange[1]):
             date = datetime.datetime(year=self._date.year, month=self._date.month, day=day + 1)
 
-            if date.weekday() not in (5, 6):  # saturday and sunday
-                row = table.row(style=WHITE_CELL)
-                row.cell(f"{date.day}", align=fpdf.enums.Align.C)
-                row.cell(self.START_TIME, align=fpdf.enums.Align.C)
-                row.cell(self.END_TIME, align=fpdf.enums.Align.C)
-                if date in self._public_holidays:
-                    row.cell("Public Holiday", align=fpdf.enums.Align.C)
-                elif date in self._vacation_days:
-                    row.cell("Vacation", align=fpdf.enums.Align.C)
-                else:
-                    self._work_days_total += 1
-                    row.cell(f"{self.WORK_HOURS}", align=fpdf.enums.Align.C)
-                if self._signature:
-                    row.cell(img=str(self._signature))
-                else:
-                    row.cell()
-
-            else:
+            if date.weekday() in (5, 6) and date not in self._additional_workdays:
                 row = table.row(style=RED_CELL)
                 row.cell(f"{date.day}", align=fpdf.enums.Align.C)
                 for _ in self.COLUMNS[1:]:
                     row.cell()
+                continue
+
+            row = table.row(style=WHITE_CELL)
+            row.cell(f"{date.day}", align=fpdf.enums.Align.C)
+            row.cell(self.START_TIME, align=fpdf.enums.Align.C)
+            row.cell(self.END_TIME, align=fpdf.enums.Align.C)
+            if date in self._public_holidays:
+                row.cell("Public Holiday", align=fpdf.enums.Align.C)
+            elif date in self._vacation_days:
+                row.cell("Vacation", align=fpdf.enums.Align.C)
+            else:
+                self._work_days_total += 1
+                row.cell(f"{self.WORK_HOURS}", align=fpdf.enums.Align.C)
+            if self._signature:
+                row.cell(img=str(self._signature))
+            else:
+                row.cell()
 
     def _create_footer(self, table: fpdf.table.Table) -> None:
         row = table.row(style=WHITE_CELL)
@@ -111,11 +105,26 @@ class PdfCreator(fpdf.FPDF):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    pdf = PdfCreator(
+    attendance_params = c.AttendanceParams(
         name="Vorobev Viktor",
-        vacation_days=[],
-        public_holidays=[datetime.datetime(year=2024, month=10, day=23)],
+        month=12,
+        year=2024,
+        vacation_days=[
+            datetime.datetime(year=2024, month=12, day=30),
+            datetime.datetime(year=2024, month=12, day=31),
+        ],
+        public_holidays=[
+            datetime.datetime(year=2024, month=12, day=24),
+            datetime.datetime(year=2024, month=12, day=25),
+            datetime.datetime(year=2024, month=12, day=26),
+            datetime.datetime(year=2024, month=12, day=27),
+        ],
+        additional_workdays=[
+            datetime.datetime(year=2024, month=12, day=7),
+            datetime.datetime(year=2024, month=12, day=14),
+        ],
         signature=pathlib.Path("./example.png"),
     )
+    pdf = PdfCreator(attendance_params)
     pdf.create_pdf()
     pdf.output("test.pdf")
