@@ -32,6 +32,7 @@ class PdfCreator(fpdf.FPDF):
         self._public_holidays = attendance_params.public_holidays or []
         self._vacation_days = attendance_params.vacation_days or []
         self._additional_workdays = attendance_params.additional_workdays or []
+        self._additional_holidays = attendance_params.additional_holidays or []
 
         self._signature = attendance_params.signature
         self._work_days_total = 0
@@ -63,7 +64,10 @@ class PdfCreator(fpdf.FPDF):
         for day in range(monthrange[1]):
             date = datetime.datetime(year=self._date.year, month=self._date.month, day=day + 1)
 
-            if date.weekday() in (5, 6) and date not in self._additional_workdays:
+            date_is_sunday_or_saturday = date.weekday() in (5, 6)
+            date_is_not_additional_workday = date not in self._additional_workdays
+            date_is_additional_holiday = date in self._additional_holidays
+            if (date_is_sunday_or_saturday and date_is_not_additional_workday) or date_is_additional_holiday:
                 row = table.row(style=RED_CELL)
                 row.cell(f"{date.day}", align=fpdf.enums.Align.C)
                 for _ in self.COLUMNS[1:]:

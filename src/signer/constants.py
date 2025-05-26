@@ -12,6 +12,7 @@ class AttendanceParams:
     public_holidays: list[datetime.date] | None = None
     vacation_days: list[datetime.date] | None = None
     signature: pathlib.Path | None = None
+    additional_holidays: list[datetime.date] | None = None
 
     @property
     def date(self) -> datetime.date:
