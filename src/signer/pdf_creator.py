@@ -13,6 +13,7 @@ WHITE_CELL = fpdf.FontFace(family="Times", emphasis="B", size_pt=12, fill_color=
 
 class PdfCreator(fpdf.FPDF):
     TITLE = "Emlid Tech Kft. Jelenléti ív - {}"
+    FILE_NAME = "{} Sheet {}.pdf"
     COLUMNS = ("", "Kezdés\nStart time", "Vége\nEnd time", "Ledolgozott óra\nWork hours", "Aláírás\nSignature")
     START_TIME = "9:00"
     END_TIME = "18:00"
@@ -45,6 +46,10 @@ class PdfCreator(fpdf.FPDF):
             self._create_header(table)
             self._create_body(table)
             self._create_footer(table)
+
+    def save_pdf(self) -> None:
+        file_name = self.FILE_NAME.format(self._date.strftime("%B"), self._name)
+        self.output(file_name)
 
     def _create_header(self, table: fpdf.table.Table) -> None:
         self.set_font(family="Times", style="B", size=12)
@@ -131,4 +136,4 @@ if __name__ == "__main__":  # pragma: no cover
     )
     pdf = PdfCreator(attendance_params)
     pdf.create_pdf()
-    pdf.output("test.pdf")
+    pdf.save_pdf()
