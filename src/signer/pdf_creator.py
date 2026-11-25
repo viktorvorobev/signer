@@ -75,7 +75,13 @@ class PdfCreator(fpdf.FPDF):
             if (date_is_sunday_or_saturday and date_is_not_additional_workday) or date_is_additional_holiday:
                 row = table.row(style=RED_CELL)
                 row.cell(f"{date.day}", align=fpdf.enums.Align.C)
-                for _ in self.COLUMNS[1:]:
+                for _ in self.COLUMNS[1:-2]:
+                    row.cell()
+                if date in self._public_holidays:
+                    row.cell("Public Holiday", align=fpdf.enums.Align.C)
+                    row.cell()
+                else:
+                    row.cell()
                     row.cell()
                 continue
 
